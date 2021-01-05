@@ -1,8 +1,16 @@
 import React from "react";
+import { hot } from "react-hot-loader";
+import Header from "./components/Header/Header";
+import Footer from "./components/Footer/Footer";
 import "./App.scss";
 
 const App = () => {
-  <h1>Hi There!</h1>;
+  return (
+    <section className='main'>
+      <Header />
+      <Footer />
+    </section>
+  );
 };
 
-export default App;
+export default hot(module)(App);

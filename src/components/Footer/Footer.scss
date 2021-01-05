@@ -1,0 +1,23 @@
+.main__footer {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  bottom: 0;
+  padding: 15px;
+  min-height: 15vh;
+  min-width: 70%;
+  font-size: 1em;
+
+  .footer__icon {
+    a {
+      color: #fff;
+      margin: 0 5px;
+      transition: all 0.5s ease-out;
+
+      &:hover {
+        color: var(--main-red) !important;
+        transform: scale(1.2);
+      }
+    }
+  }
+}
