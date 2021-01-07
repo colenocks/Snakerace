@@ -22,3 +22,15 @@ body {
   font-size: 1rem;
   color: #fff;
 }
+.main__container {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+}
+
+.main__content {
+  position: relative;
+  min-height: 67vh;
+  margin: 0 3%;
+  padding-bottom: 3em; /* footer height, to make stick */
+}
