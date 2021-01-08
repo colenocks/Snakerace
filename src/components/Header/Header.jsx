@@ -2,11 +2,21 @@ import React from "react";
 import foodImage from "../../assets/food.png";
 import "./Header.scss";
 
-const Header = () => {
+const Header = (props) => {
+  const { user_session, logoutHandler } = props;
   return (
-    <header id='header'>
-      <img id='logo' src={foodImage} alt='Apple Image' />
-      <h2>SNAKE RACE</h2>
+    <header className='header-container'>
+      <div className='main-logo'>
+        <img src={foodImage} alt='Apple Image' />
+        <h2>snake race</h2>
+      </div>
+      <div className='logout'>
+        {user_session ? (
+          <a href='/' onClick={logoutHandler}>
+            Logout
+          </a>
+        ) : null}
+      </div>
     </header>
   );
 };

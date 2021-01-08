@@ -1,21 +1,30 @@
-#header {
+.header-container {
   height: 50px;
   width: 100%;
   display: flex;
+  justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
   background-color: #000;
   color: var(--main-red);
   letter-spacing: 5px;
+  text-transform: capitalize;
   padding: 10px;
-  opacity: 0.8;
+  //   opacity: 0.8;
 
-  #logo {
-    margin-right: 20px;
+  .main-logo {
+    display: flex;
+    img {
+      margin-right: 20px;
+    }
+
+    h2 {
+      margin-left: 20px;
+      margin: auto 0;
+    }
   }
 
-  h2 {
-    margin-left: 20px;
-    margin: auto 0;
+  .logout {
+    margin: 1rem;
   }
 }
