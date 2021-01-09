@@ -1,0 +1,32 @@
+.countdown-container {
+  position: relative;
+  width: 100%;
+  padding: 0.4rem;
+  margin: 0.4rem auto;
+  display: flex;
+  flex-direction: column;
+
+  .timer-container,
+  .button-container {
+    display: flex;
+    justify-content: center;
+  }
+  .button-container {
+    background-color: #3c353b;
+    padding: 0.2rem 1rem;
+  }
+  .timer {
+    align-self: center;
+    border: 1px solid #fff;
+    padding: 0.2rem 1rem;
+    font-size: 1.2rem;
+    border-radius: 5px;
+    margin: 0.3rem 0;
+  }
+  button {
+    margin: 0 3%;
+    justify-content: left;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+  }
+}
