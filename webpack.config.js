@@ -13,7 +13,7 @@ module.exports = {
         options: { presets: ["@babel/env"] },
       },
       {
-        test: /\.s[ac]ss$/i,
+        test: /\.s?[a?c]ss$/i,
         use: ["style-loader", "css-loader", "sass-loader"],
       },
       {
@@ -39,6 +39,7 @@ module.exports = {
     port: 3000,
     publicPath: "http://localhost:3000/dist/",
     hotOnly: true,
+    historyApiFallback: true,
   },
   plugins: [new webpack.HotModuleReplacementPlugin()],
 };
