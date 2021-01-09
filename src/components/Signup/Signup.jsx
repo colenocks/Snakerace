@@ -20,7 +20,7 @@ class Signup extends Component {
   render() {
     const { signupHandler } = this.props;
     return (
-      <div className='signup__form col-12 col-md-6'>
+      <div className='signup__form'>
         <form
           className=''
           onSubmit={(e) => signupHandler(e, this.state.signupData)}>
@@ -73,16 +73,6 @@ class Signup extends Component {
             </button>
           </div>
         </form>
-        <div className='form__info'>
-          <p>
-            I have an account.{" "}
-            <span>
-              <a href='/login' className='text-success'>
-                Go to Login
-              </a>
-            </span>
-          </p>
-        </div>
       </div>
     );
   }

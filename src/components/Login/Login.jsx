@@ -21,8 +21,7 @@ class Login extends Component {
   render() {
     const { loginHandler } = this.props;
     return (
-      <div className='login__form col-12 col-md-6'>
-        {/* <div id='welcome-message' role='alert'></div> */}
+      <div className='login__form'>
         <form
           className=''
           onSubmit={(e) => loginHandler(e, this.state.loginData)}>
@@ -51,16 +50,6 @@ class Login extends Component {
               className='btn btn-success btn-md w-100'>
               Login
             </button>
-            <div className='form__info'>
-              <p>
-                Don't have an account?{" "}
-                <span>
-                  <a href='/signup' className='text-primary'>
-                    Go to Sign up
-                  </a>
-                </span>
-              </p>
-            </div>
           </div>
         </form>
       </div>
