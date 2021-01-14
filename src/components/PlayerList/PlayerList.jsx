@@ -54,7 +54,7 @@ class PlayerList extends Component {
        
     */
   render() {
-    const { players } = this.state;
+    const { players } = this.props;
     return (
       <aside className='playerlist-container'>
         <ul className='list-group w-50 d-flex mx-auto'>
