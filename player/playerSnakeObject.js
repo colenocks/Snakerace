@@ -1,5 +1,6 @@
-const canvasWidth = 530;
-const canvasHeight = 320;
+//These have to be the same as the canvas dimensions in frontend canvas(@Arena Component)
+const canvasWidth = 600;
+const canvasHeight = 300;
 const cell = 20;
 
 class Player {
@@ -14,7 +15,6 @@ class Player {
     this.snake = [];
     this.score = 0;
     this.newLength = false;
-    this.update = this.update.bind(this);
   }
   //when snake moves
   update() {
@@ -43,14 +43,14 @@ class Player {
   }
 }
 
-//generalizing the hasEatenFood function
 const hasEatenFood = (player, food) => {
   if (player.x == food.x && player.y == food.y) {
-    player.score = player.score + 1;
+    player.score = player.score + 2;
     player.newLength = true;
     return true;
   }
 };
+
 const setPlayerPosition = (players) => {
   players.map((player) => {
     switch (index) {
@@ -84,26 +84,6 @@ const createFood = (players) => {
   });
   return { x: x, y: y };
 };
-
-// const checkScoreLimit = (players) => {
-//   const LIMIT = 5;
-//   let length = players.length;
-//   let index = 0;
-//   switch (length) {
-//     case 1:
-//       if (players[index].score == LIMIT) {
-//         io.emit("send winner", players[index].name);
-//       }
-//       break;
-//     case 2:
-//       if (players[index].score == LIMIT) {
-//         io.emit("send winner", players[index].name);
-//       } else if (players[index + 1].score == LIMIT) {
-//         io.emit("send winner", players[index + 1].name);
-//       }
-//       break;
-//   }
-// };
 
 module.exports = {
   Player,

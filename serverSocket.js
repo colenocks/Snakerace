@@ -4,46 +4,45 @@ const {
   hasEatenFood,
   setPlayerColor,
   setPlayerPosition,
-} = require("./playerSnakeObject");
+} = require("./player/playerSnakeObject");
 
-exports.socketServer = (io) => {
+exports.serverSocket = (io) => {
   const players = [];
-  let foodObject;
+  var foodObject;
+  var currentPlayer = null;
+
+  const setNewFoodPosition = (players) => {
+    foodObject = createFood(players);
+    io.sockets.emit("send food", foodObject);
+  };
 
   io.on("connection", (socket) => {
-    let currentPlayer = new Player();
-
-    const setNewFoodPosition = (players) => {
-      foodObject = createFood(players);
-      socket.broadcast.emit("send food", foodObject);
-    };
-
     // receive name from client
     socket.on("join game", (name, userId) => {
+      currentPlayer = new Player();
       if (name || userId) {
         currentPlayer.name = name;
         currentPlayer.id = userId;
         currentPlayer.instanceId = socket.id;
-
-        socket.emit("player instance", currentPlayer);
+        io.sockets.emit("player instance", currentPlayer);
+        console.log("joined game");
       }
     });
 
-    socket.on("enter arena", (playerInstance) => {
-      players.push(playerInstance);
+    socket.on("enter arena", (player) => {
+      players.push(currentPlayer);
       setPlayerColor(players);
       // setPlayerPosition(players);
+
+      io.sockets.emit("update playerslist", players);
     });
 
     socket.on("start game", () => {
-      socket.broadcast.emit("update playerslist", players);
-
       setNewFoodPosition(players);
+      console.log("started game");
     });
 
     socket.on("keycode", (key) => {
-      //   console.log(playerInstance.update);
-      //   return;
       if (key === 38) {
         //up
         currentPlayer.y--;
@@ -53,8 +52,9 @@ exports.socketServer = (io) => {
             setNewFoodPosition(players);
           }
         });
-        socket.broadcast.emit("player moved", currentPlayer, players);
-      } else if (key === 40) {
+        io.sockets.emit("move up", { currentPlayer, players });
+      }
+      if (key === 40) {
         //down
         currentPlayer.y++;
         currentPlayer.update();
@@ -63,8 +63,9 @@ exports.socketServer = (io) => {
             setNewFoodPosition(players);
           }
         });
-        socket.broadcast.emit("player moved", currentPlayer, players);
-      } else if (key === 37) {
+        io.sockets.emit("move down", { currentPlayer, players });
+      }
+      if (key === 37) {
         //left
         currentPlayer.x--;
         currentPlayer.update();
@@ -73,8 +74,9 @@ exports.socketServer = (io) => {
             setNewFoodPosition(players);
           }
         });
-        socket.broadcast.emit("player moved", currentPlayer, players);
-      } else if (key === 39) {
+        io.sockets.emit("move left", { currentPlayer, players });
+      }
+      if (key === 39) {
         //right
         currentPlayer.x++;
         currentPlayer.update();
@@ -83,23 +85,21 @@ exports.socketServer = (io) => {
             setNewFoodPosition(players);
           }
         });
-        socket.broadcast.emit("player moved", currentPlayer, players);
+        io.sockets.emit("move right", { currentPlayer, players });
       }
     });
 
+    socket.on("game over", () => {
+      io.sockets.emit("time up", players);
+    });
+
     socket.on("disconnect", () => {
-      if (currentPlayer.name) {
+      if (currentPlayer) {
         players.splice(players.indexOf(currentPlayer), 1);
         console.log(currentPlayer.name + " just left: ");
-        socket.emit("player left ", players);
+        socket.emit("player left", players);
         socket.broadcast.emit("update playerlist", players);
       }
     });
   });
 };
-
-// socket.broadcast.emit("check player", currentPlayer, players);
-
-// socket.on("check score", (data) => {
-//   checkScoreLimit(data);
-// });

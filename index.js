@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const session = require("express-session");
-const { socketServer } = require("./socketServer");
+const { serverSocket } = require("./serverSocket");
 
 const routes = require("./routes/allRoutes");
 
@@ -59,4 +59,4 @@ const io = new socket.Server(server, {
   },
 });
 
-socketServer(io);
+serverSocket(io);
