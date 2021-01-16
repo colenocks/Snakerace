@@ -1,6 +1,5 @@
 import React, { Component } from "react";
-import socketIOClient from "socket.io-client";
-import { getBaseURL } from "./../../AxiosConfig";
+import { socket } from "../../clientSocket";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./EnterGame.scss";
@@ -34,18 +33,25 @@ class EnterGame extends Component {
   joinGameHandler() {
     const { username, user_session } = this.state;
     if (username || user_session) {
-      const socket = socketIOClient(getBaseURL());
+      if (!socket.connected) {
+        socket.connect();
+      }
       this.setState({
         disableJoinBtn: true,
         disableEnterBtn: false,
       });
-      //   toast("You just joined the game", { type: "info" });
+      toast("You just joined the game", { type: "info" });
       socket.emit("join game", username, user_session);
 
       //get player instance
       socket.on("player instance", (playerInstance) => {
-        this.setState({ playerInstance });
-        localStorage.setItem("playerInstance", JSON.stringify(playerInstance));
+        if (playerInstance) {
+          this.setState({ playerInstance });
+          localStorage.setItem(
+            "playerInstance",
+            JSON.stringify(playerInstance)
+          );
+        }
       });
     } else {
       toast("You are not logged in");
@@ -53,14 +59,12 @@ class EnterGame extends Component {
   }
 
   enterGameHandler() {
-    //get playerInstance
-    const socket = socketIOClient(getBaseURL());
-    socket.emit("enter arena", this.state.playerInstance);
-    // this.setState({
-    //   disableJoinBtn: false,
-    //   disableEnterBtn: true,
-    // });
     // display race arena
+    socket.emit("enter arena", this.state.playerInstance);
+    this.setState({
+      disableJoinBtn: false,
+      disableEnterBtn: true,
+    });
     this.props.history.push("/arena");
   }
 

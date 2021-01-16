@@ -1,49 +1,64 @@
 import React, { Component } from "react";
+import { socket } from "../../clientSocket";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import "./Countdown.scss";
 
 class Countdown extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      startTime: 60,
+      startTime: 10,
       disableRestartBtn: true,
       disableFinishBtn: true,
       disableStartBtn: false,
     };
 
     this.countdownHandler = this.countdownHandler.bind(this);
-    this.beginCountdown = this.beginCountdown.bind(this);
+    this.startGameHandler = this.startGameHandler.bind(this);
     this.endGameHandler = this.endGameHandler.bind(this);
-    this.restartGameHandler = this.beginCountdown.bind(this);
+    this.restartGameHandler = this.restartGameHandler.bind(this);
   }
 
   countdownHandler() {
     let time = this.state.startTime;
     if (time === 0) {
-      clearInterval(this.beginCountdown);
       this.setState({
         disableStartBtn: true,
         disableRestartBtn: false,
         disableFinishBtn: false,
+        startTime: "Time up", //reset
       });
+      this.startGameHandler();
+      socket.emit("game over");
+      toast("Game over!", { type: "dark" });
       return;
     }
-    time--;
-    this.setState(
-      {
+    if (time <= 10) {
+      time--;
+      this.setState({
         startTime: time,
-      },
-      () => console.log(this.state.startTime)
-    );
+      });
+    }
   }
 
-  beginCountdown() {
-    if (this.state.startTime > 0) {
-      setInterval(this.countdownHandler, 1500);
+  startGameHandler() {
+    let startTime = this.state.startTime;
+    let startGame;
+    localStorage.setItem("hasStartedGame", true);
+    if (startTime <= 10) {
+      this.setState({ disableStartBtn: true });
+      socket.emit("start game");
+      startGame = setInterval(this.countdownHandler, 1500);
+    }
+    if (startTime === 11 || startTime === 0) {
+      socket.emit("time up");
+      clearInterval(startGame);
     }
   }
 
   endGameHandler() {
+    console.log("Game Ended");
     /* TODOS:
       1. reset canvas, 
       2. send score value to database
@@ -54,12 +69,14 @@ class Countdown extends Component {
 
   restartGameHandler() {
     /* TODOS:
-      1. reset canvas
       2. send score value to database
       3. update leaderboard
-      4. enable Start button and reset startTime = 60sec
-      5. User click on start to start playing.
     */
+    this.setState({
+      disableRestartBtn: true,
+      disableStartBtn: false,
+      startTime: 10,
+    });
   }
 
   render() {
@@ -68,12 +85,13 @@ class Countdown extends Component {
         <div className='button-container'>
           <button
             className='btn btn-info btn-xs w-10'
+            onClick={this.restartGameHandler}
             disabled={this.state.disableRestartBtn}>
             Restart
           </button>
           <button
             className='btn btn-success btn-xs w-15'
-            onClick={this.beginCountdown}
+            onClick={this.startGameHandler}
             disabled={this.state.disableStartBtn}>
             Start Game
           </button>

@@ -1,0 +1,24 @@
+.arena-container {
+  .canvas-container {
+    display: flex;
+    flex-direction: column;
+    margin: 1rem 0;
+    .versus-div {
+      width: 500px;
+      background: #608da7;
+      opacity: 0.8;
+      padding: 0.2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .canvas-wrapper {
+      margin: 0 auto;
+      canvas {
+        background-color: black;
+        border: 2px solid #608da7;
+      }
+    }
+  }
+}
