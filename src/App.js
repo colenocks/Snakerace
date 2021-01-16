@@ -4,10 +4,10 @@ import { Route, Switch, withRouter } from "react-router-dom";
 import Header from "./components/Header/Header";
 import Footer from "./components/Footer/Footer";
 import Home from "./components/Home/Home";
-import Arena from "./components/Arena/Arena";
 import EnterGame from "./components/EnterGame/EnterGame";
-import { clientRequest, getBaseURL } from "./AxiosConfig";
-import socketIOClient from "socket.io-client";
+import Arena from "./components/Arena/Arena";
+import { clientRequest } from "./axiosConfig";
+import { socket } from "./clientSocket";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./App.scss";
@@ -46,20 +46,23 @@ class App extends Component {
     clientRequest()
       .post("/login", loginData)
       .then((res) => {
+        if (res.data.errMessage) {
+          toast(res.data.errMessage, {
+            type: "error",
+          });
+          return;
+        }
         toast("Login successful", {
           type: "success",
         });
         localStorage.setItem("is_logged_in", true);
         localStorage.setItem("user_session", res.data.user_session);
         localStorage.setItem("username", res.data.username);
-        this.setState(
-          {
-            is_logged_in: true,
-            user_session: res.data.user_session,
-            username: res.data.username,
-          },
-          () => this.props.history.push("/entergame")
-        );
+        this.setState({
+          is_logged_in: true,
+          user_session: res.data.user_session,
+          username: res.data.username,
+        });
       })
       .catch((err) => {
         console.error("Login Error: " + err);
@@ -76,7 +79,16 @@ class App extends Component {
     clientRequest()
       .post("/signup", signupData)
       .then((res) => {
-        console.log(res.data);
+        if (res.data.errMessage) {
+          toast(res.data.errMessage, {
+            type: "success",
+          });
+          return;
+        }
+        toast(res.data.message, {
+          type: "success",
+        });
+        this.props.history.go();
       })
       .catch((err) => {
         console.error("Signup Error: " + err);
@@ -87,28 +99,20 @@ class App extends Component {
   }
 
   logoutHandler() {
-    const url = getBaseURL();
-    const socket = socketIOClient(url);
-
     clientRequest()
       .get("/logout")
       .then((res) => {
-        console.log(res);
         toast(res.data.message, { type: "dark" });
-        this.setState({
-          user_session: null,
-          is_logged_in: false,
-        });
-        localStorage.clear();
         socket.disconnect();
         this.props.history.push("/");
       })
-      .catch((err) => {
-        console.error("Signup Error: " + err);
-        this.setState({
-          is_logged_in: false,
-        });
-      });
+      .catch((err) => console.error("Signup Error: " + err));
+
+    localStorage.clear();
+    this.setState({
+      user_session: null,
+      is_logged_in: false,
+    });
   }
 
   render() {
@@ -124,30 +128,26 @@ class App extends Component {
             <Route
               exact
               path='/'
+              render={(props) =>
+                this.state.is_logged_in ? (
+                  <EnterGame
+                    {...props}
+                    username={this.state.username}
+                    user_session={this.state.user_session}
+                  />
+                ) : (
+                  <Home
+                    loginHandler={this.loginHandler}
+                    signupHandler={this.signupHandler}
+                  />
+                )
+              }
+            />
+            <Route
+              exact
+              path={`/arena`}
               render={() => (
-                <Home
-                  loginHandler={this.loginHandler}
-                  signupHandler={this.signupHandler}
-                />
-              )}
-            />
-            <Route
-              exact
-              path='/arena'
-              render={(props) => (
                 <Arena
-                  {...props}
-                  user_session={this.state.user_session}
-                  username={this.state.username}
-                />
-              )}
-            />
-            <Route
-              exact
-              path='/entergame'
-              render={(props) => (
-                <EnterGame
-                  {...props}
                   user_session={this.state.user_session}
                   username={this.state.username}
                 />

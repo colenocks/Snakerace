@@ -6,20 +6,20 @@ const Player = mongoose.model("Player", playerSchema);
 exports.signUpPlayer = (req, res) => {
   let newPlayer = new Player(req.body);
   //check if player exists
-  newPlayer.save((err, Player) => {
-    if (err) {
-      res.json({ errMessage: err + "-> Player was not added!" });
+  newPlayer.save((err, player) => {
+    if (!player) {
+      res.json({ errMessage: "-> Sign up error please try again!" });
       return;
     }
-    res.json({ user: Player, message: "User saved successfully!" });
+    res.json({ message: "You have signed up successfully!" });
   });
 };
 
 exports.loginPlayer = (req, res) => {
   const { username, password } = req.body;
   Player.findOne({ username: username, password: password }, (err, player) => {
-    if (err) {
-      res.json({ errMessage: err + "Username or password incorrect" });
+    if (!player) {
+      res.json({ errMessage: "Username or password incorrect" });
       return;
     }
     req.session.userId = player._id;
@@ -39,8 +39,8 @@ exports.logoutPlayer = (req, res) => {
 
 // exports.getAllPlayers = (req, res) => {
 //   Player.find({}, (err, player) => {
-//     if (err) {
-//       res.json({ errMessage: err + "-> Could not fetch players!" });
+//     if (!player) {
+//       res.json({ errMessage: "-> Could not fetch players!" });
 //     }
 //     res.json(player);
 //   });
@@ -50,8 +50,8 @@ exports.logoutPlayer = (req, res) => {
 //   let username = req.params.username;
 //   1;
 //   Player.findOne({ username: username }, (err, player) => {
-//     if (err) {
-//       res.json({ errMessage: err + "-> Cannot find Player!" });
+//     if (!player) {
+//       res.json({ errMessage: "-> Cannot find Player!" });
 //     }
 //     res.json(player);
 //   });
