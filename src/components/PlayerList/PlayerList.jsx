@@ -40,7 +40,6 @@ class PlayerList extends Component {
         players.splice(players.indexOf(playerInstance), 1);
         this.updatePlayerList(players);
         localStorage.removeItem("playerInstance");
-        localStorage.removeItem("hasStartedGame");
         socket.disconnect();
         this.props.history.push("/");
         location.reload(); //this causes the canvas element to re-render
@@ -60,6 +59,7 @@ class PlayerList extends Component {
             ? players.map((player) => {
                 return (
                   <li
+                    id={player.color}
                     key={player.id}
                     className='list-group-item text-capitalize'>
                     {player.name}
