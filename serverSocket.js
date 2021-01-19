@@ -9,9 +9,8 @@ const {
 exports.serverSocket = (io) => {
   const players = [];
   var foodObject;
-  var currentPlayer = null;
-  var isStart = null;
-  var startTime = 60;
+  const startTime = 30;
+  var time = startTime;
   let game = null;
 
   const broadcastFood = (players) => {
@@ -19,30 +18,28 @@ exports.serverSocket = (io) => {
     io.sockets.emit("send food", foodObject);
   };
 
-  const gameTimer = () => {
-    if (startTime === 0) {
-      io.sockets.emit("time up");
-      console.log("time up");
+  const gameTimer = (players) => {
+    if (time === 0) {
+      io.sockets.emit("time up", players);
       clearInterval(game);
       return;
     }
-    if (startTime <= 60) {
-      startTime--;
-      console.log("timer: ", startTime);
+    if (time <= startTime) {
+      time--;
+      io.sockets.emit("countdown", time);
     }
   };
 
   io.on("connection", (socket) => {
+    let currentPlayer = new Player();
     // receive name from client
     socket.on("join game", (name, userId) => {
-      startTime = 60;
-      currentPlayer = new Player();
       if (name || userId) {
         currentPlayer.name = name;
         currentPlayer.id = userId;
         currentPlayer.instanceId = socket.id;
         io.sockets.emit("player instance", currentPlayer);
-        console.log("joined game");
+        console.log(name + " has joined game");
       }
     });
 
@@ -53,23 +50,23 @@ exports.serverSocket = (io) => {
 
       io.sockets.emit("update playerslist", players);
 
-      // start game and timer after 60 seconds
-      setTimeout(() => {
-        isStart = true;
-        // io.sockets.emit("start game", isStart);
-        broadcastFood(players);
-        console.log("started game");
-        game = setInterval(gameTimer, 1500);
-      }, 3000);
+      // start game and timer after 5 seconds
+      if (players.length === 2) {
+        setTimeout(() => {
+          broadcastFood(players);
+          console.log("Game started!");
+          game = setInterval(gameTimer, 1500, players);
+        }, 5000);
+      }
     });
 
-    socket.on("keycode", (key, data) => {
+    socket.on("keycode", (key) => {
       if (key === 38) {
         //up
         currentPlayer.y--;
         currentPlayer.update();
         players.map((player) => {
-          if (hasEatenFood(player, foodObject)) {
+          if (foodObject && hasEatenFood(player, foodObject)) {
             broadcastFood(players);
           }
         });
@@ -80,7 +77,7 @@ exports.serverSocket = (io) => {
         currentPlayer.y++;
         currentPlayer.update();
         players.map((player) => {
-          if (hasEatenFood(player, foodObject)) {
+          if (foodObject && hasEatenFood(player, foodObject)) {
             broadcastFood(players);
           }
         });
@@ -91,7 +88,7 @@ exports.serverSocket = (io) => {
         currentPlayer.x--;
         currentPlayer.update();
         players.map((player) => {
-          if (hasEatenFood(player, foodObject)) {
+          if (foodObject && hasEatenFood(player, foodObject)) {
             broadcastFood(players);
           }
         });
@@ -102,7 +99,7 @@ exports.serverSocket = (io) => {
         currentPlayer.x++;
         currentPlayer.update();
         players.map((player) => {
-          if (hasEatenFood(player, foodObject)) {
+          if (foodObject && hasEatenFood(player, foodObject)) {
             broadcastFood(players);
           }
         });
@@ -110,15 +107,11 @@ exports.serverSocket = (io) => {
       }
     });
 
-    socket.on("game over", () => {
-      io.sockets.emit("time up", players);
-    });
-
     socket.on("disconnect", () => {
       if (currentPlayer) {
         players.splice(players.indexOf(currentPlayer), 1);
         console.log(currentPlayer.name + " just left: ");
-        socket.emit("player left", players);
+        io.sockets.emit("player left", players);
         io.sockets.emit("update playerslist", players);
       }
     });
