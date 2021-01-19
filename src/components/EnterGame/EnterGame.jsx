@@ -72,13 +72,14 @@ class EnterGame extends Component {
     return (
       <section className='entergame-container'>
         <h4 className='entergame-text'>
-          Hi{" "}
-          <span className='text-uppercase text-danger'>
+          Welcome{" "}
+          <span className='text-capitalize text-danger font-weight-bold'>
             {this.state.username}
           </span>
-          , click <span className='text-primary'>join</span> to wait to be
-          connected and then <span className='text-success'>play</span> to enter
-          game room
+          , click <span className='text-primary'>join game</span> to wait to be
+          connected and then{" "}
+          <span className='text-success'>enter the arena</span> . Game starts
+          after two players have joined. Goodluck!😜
         </h4>
         <div className='entergame-button'>
           <ul>
@@ -87,7 +88,7 @@ class EnterGame extends Component {
                 onClick={this.joinGameHandler}
                 type='button'
                 className='btn btn-primary btn-sm'
-                value='Join'
+                value='Join Game'
                 disabled={this.state.disableJoinBtn}
               />
             </li>
@@ -96,7 +97,7 @@ class EnterGame extends Component {
                 onClick={this.enterGameHandler}
                 type='button'
                 className='btn btn-success btn-sm'
-                value='play'
+                value='Enter Arena'
                 disabled={this.state.disableEnterBtn}
               />
             </li>
