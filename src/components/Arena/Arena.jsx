@@ -19,7 +19,7 @@ class Arena extends Component {
       allPlayers: [],
       playerInstance: null,
       direction: "",
-      timeUp: false,
+      time: 30,
     };
 
     this.clearCanvasHandler = this.clearCanvasHandler.bind(this);
@@ -30,69 +30,64 @@ class Arena extends Component {
     this.setFoodPosition = this.setFoodPosition.bind(this);
     this.moveSnakeHandler = this.moveSnakeHandler.bind(this);
     this.updatePlayerInstance = this.updatePlayerInstance.bind(this);
-    this.updatePlayersList = this.updatePlayersList.bind(this);
-    this.removePlayerOnLeave = this.removePlayerOnLeave.bind(this);
+    this.updateCanvasHandler = this.updateCanvasHandler.bind(this);
+    this.displayCountDown = this.displayCountDown.bind(this);
   }
 
   componentDidMount() {
-    const players = JSON.parse(localStorage.getItem("players"));
-    const playerInstance = JSON.parse(localStorage.getItem("playerInstance"));
-    if (playerInstance) {
-      this.setState({ playerInstance });
-    }
-
     if (this.canvasElem) {
-      socket.on("update playerslist", (allPlayers) => {
-        this.updatePlayersList(allPlayers);
-        // this.updatePlayerInstance(playerInstance);
+      socket.on("update playerslist", (players) => {
+        this.setState({ allPlayers: players });
+        this.updateCanvasHandler(players);
       });
 
-      // only listen for keydown event when start game has been clicked
       let direction;
       this.startGameHandler(direction);
     }
   }
 
   componentDidUpdate() {
-    socket.on("player left", (allplayers) => {
-      this.updatePlayersList(allplayers);
-      console.log("A player has left");
-    });
+    // if (socket.active) {
+    //   socket.on("player left", (players) => {
+    //     console.log("player has left");
+    //     this.updateCanvasHandler(players);
+    //   });
+    // }
   }
 
   startGameHandler(direction) {
     let game = setInterval(() => {
-      this.setFoodPosition();
-      const hasStartedGame = localStorage.getItem("hasStartedGame");
-      if (hasStartedGame) {
-        // update food position
-        this.canvasElem.onkeydown = (event) => {
-          event.preventDefault();
-          if (event.keyCode === 38 && direction !== "down") {
-            direction = "up";
-          }
-          if (event.keyCode === 40 && direction !== "up") {
-            direction = "down";
-          }
-          if (event.keyCode === 37 && direction !== "right") {
-            direction = "left";
-          }
-          if (event.keyCode === 39 && direction !== "left") {
-            direction = "right";
-          }
-        };
-        this.moveSnakeHandler(direction);
-        this.timeUpHandler(game);
-      }
-    }, 1000 / 2);
+      this.displayCountDown();
+      this.canvasElem.onkeydown = (event) => {
+        event.preventDefault();
+        if (event.keyCode === 38 && direction !== "down") {
+          direction = "up";
+        }
+        if (event.keyCode === 40 && direction !== "up") {
+          direction = "down";
+        }
+        if (event.keyCode === 37 && direction !== "right") {
+          direction = "left";
+        }
+        if (event.keyCode === 39 && direction !== "left") {
+          direction = "right";
+        }
+      };
+      this.moveSnakeHandler(direction);
+      this.timeUpHandler(game);
+    }, 1000 / 3);
   }
 
   timeUpHandler(game) {
     socket.on("time up", (players) => {
       clearInterval(game);
       this.setState({ allPlayers: players });
-      localStorage.setItem("players", JSON.stringify(players));
-      localStorage.setItem("hasStartedGame", false);
+    });
+  }
+
+  displayCountDown() {
+    socket.on("countdown", (time) => {
+      this.setState({ time });
     });
   }
 
@@ -101,33 +96,29 @@ class Arena extends Component {
       case "up":
         socket.emit("keycode", 38);
         socket.on("move up", (data) => {
-          this.clearCanvasHandler();
-          this.drawPlayerSnake(data.currentPlayer, data.currentPlayer.snake);
-          // this.updatePlayersList(data.players);
+          this.updatePlayerInstance(data.currentPlayer);
+          this.updateCanvasHandler(data.players);
         });
         break;
       case "down":
         socket.emit("keycode", 40);
         socket.on("move down", (data) => {
-          this.clearCanvasHandler();
-          this.drawPlayerSnake(data.currentPlayer, data.currentPlayer.snake);
-          // this.updatePlayersList(data.players);
+          this.updatePlayerInstance(data.currentPlayer);
+          this.updateCanvasHandler(data.players);
         });
         break;
       case "left":
         socket.emit("keycode", 37);
         socket.on("move left", (data) => {
-          this.clearCanvasHandler();
-          this.drawPlayerSnake(data.currentPlayer, data.currentPlayer.snake);
-          // this.updatePlayersList(data.players);
+          this.updatePlayerInstance(data.currentPlayer);
+          this.updateCanvasHandler(data.players);
         });
         break;
       case "right":
         socket.emit("keycode", 39);
         socket.on("move right", (data) => {
-          this.clearCanvasHandler();
-          this.drawPlayerSnake(data.currentPlayer, data.currentPlayer.snake);
-          // this.updatePlayersList(data.players);
+          this.updatePlayerInstance(data.currentPlayer);
+          this.updateCanvasHandler(data.players);
         });
         break;
     }
@@ -165,19 +156,16 @@ class Arena extends Component {
   }
 
   updatePlayerInstance(playerInstance) {
-    // this.clearCanvasHandler();
-    // this.drawPlayerSnake(playerInstance, playerInstance.snake);
-    // this.setState({ playerInstance });
+    this.setState({ playerInstance });
   }
 
-  updatePlayersList(allPlayers) {
+  updateCanvasHandler(allPlayers) {
     if (allPlayers) {
-      this.setState({ allPlayers: allPlayers }, () => {
-        this.clearCanvasHandler();
-        this.state.allPlayers.map((player) => {
-          this.drawPlayerSnake(player, player.snake);
-        });
+      this.clearCanvasHandler();
+      allPlayers.map((player) => {
+        this.drawPlayerSnake(player, player.snake);
       });
+      this.setFoodPosition();
     }
   }
 
@@ -186,8 +174,6 @@ class Arena extends Component {
       this.setState({ foodObject: food }, () => this.drawFood(food));
     });
   }
-
-  removePlayerOnLeave() {}
 
   clearCanvasHandler() {
     if (this.canvasElem) {
@@ -202,7 +188,7 @@ class Arena extends Component {
     return user_session ? (
       <div className='arena-container'>
         <section className='row'>
-          <Countdown />
+          <Countdown time={this.state.time} />
         </section>
         <section className='row'>
           <div className='col-lg-9'>
