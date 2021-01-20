@@ -13,6 +13,7 @@ const app = express();
 const port = process.env.PORT || 5000;
 const mongo_uri = process.env.MONGO_URI;
 const db_name = process.env.DB_NAME;
+const host = process.env.HOST;
 
 //bodyparser setup
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -21,11 +22,11 @@ app.use(bodyParser.json());
 // Session Custom options
 app.use(
   session({
-    secret: process.env.SESS_SECRET,
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     cookie: {
-      maxAge: parseInt(process.env.SESS_LIFETIME, 10),
+      maxAge: parseInt(process.env.SESSION_LIFETIME, 10),
       sameSite: true,
     },
   })
@@ -55,7 +56,7 @@ const server = app.listen(port, () => {
 const socket = require("socket.io");
 const io = new socket.Server(server, {
   cors: {
-    origin: ["http://localhost:3000", "https://snakerace.herokuapp.com"],
+    origin: ["http://localhost:3000", host],
   },
 });
 
