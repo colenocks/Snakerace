@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import LeaderBoard from "../LeaderBoard/LeaderBoard";
 import PlayerList from "../PlayerList/PlayerList";
-import Countdown from "./../Countdown/Countdown";
+import Countdown from "../Countdown/Countdown";
 import { socket } from "../../clientSocket";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
