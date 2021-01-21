@@ -108,7 +108,7 @@ exports.serverSocket = (io) => {
     });
 
     socket.on("disconnect", () => {
-      if (currentPlayer) {
+      if (currentPlayer.name) {
         players.splice(players.indexOf(currentPlayer), 1);
         console.log(currentPlayer.name + " just left: ");
         io.sockets.emit("player left", players);

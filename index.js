@@ -48,6 +48,13 @@ mongoose.connect(
   console.log("Connected to MongoDB")
 );
 
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static("build"));
+  app.get("*", (req, res) => {
+    res.send("index.html");
+  });
+}
+
 const server = app.listen(port, () => {
   console.log("server is listening on : " + port);
 });
