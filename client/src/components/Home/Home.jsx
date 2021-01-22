@@ -38,7 +38,11 @@ class Home extends Component {
     return (
       <section className='home'>
         <h2 className='text-capitalize text-center text-success'>
-          Welcome to the race portal
+          Welcome to the race portal.
+          <h6 className='text-danger'>
+            This is a desktop application, no controls implemented for mobile
+            yet!
+          </h6>
         </h2>
         <div className='forms container row justify-content-md-center'>
           <div className='col-12 col-lg-6'>

@@ -35,6 +35,7 @@ class Arena extends Component {
   }
 
   componentDidMount() {
+    toast("Use the arrow keys for movement", { type: "dark" });
     if (this.canvasElem) {
       socket.on("update playerslist", (players) => {
         this.setState({ allPlayers: players });
