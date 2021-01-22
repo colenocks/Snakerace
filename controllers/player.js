@@ -1,10 +1,12 @@
 const mongoose = require("mongoose");
 const { playerSchema } = require("../models/playerModel");
+const { stringToLowerCase } = require("../utility/utility");
 
 const Player = mongoose.model("Player", playerSchema);
 
 exports.signUpPlayer = (req, res) => {
-  let newPlayer = new Player(req.body);
+  const user = stringToLowerCase(req.body);
+  let newPlayer = new Player(user);
   //check if player exists
   newPlayer.save((err, player) => {
     if (!player) {
@@ -16,7 +18,8 @@ exports.signUpPlayer = (req, res) => {
 };
 
 exports.loginPlayer = (req, res) => {
-  const { username, password } = req.body;
+  const user = stringToLowerCase(req.body);
+  const { username, password } = user;
   Player.findOne({ username: username, password: password }, (err, player) => {
     if (!player) {
       res.json({ errMessage: "Username or password incorrect" });

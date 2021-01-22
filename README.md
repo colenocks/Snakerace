@@ -22,6 +22,12 @@ A real time multiplayer functionality was added to the classic snake game using 
 
    Create a .env file to mirror the `.sample.env` providing their corresponding values.
 
+   Locate the `index.html` file in the `client/src` folder and add the following script just before the closing `</body>` tag.
+
+   ```
+   <script src="./dist/bundle.js"></script>
+   ```
+
    Serve the React frontend
 
    ```
